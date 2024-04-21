@@ -1,9 +1,9 @@
+from typing import Type
+
 from sqlalchemy import select
 
 from ..database import Base, engine_async, session_async_factory
 from ..models import WomanName, ManName
-
-from typing import Type
 
 
 class AsyncORM:
@@ -11,7 +11,7 @@ class AsyncORM:
     async def create_table() -> None:
         async with engine_async.begin() as connection:
             await connection.run_sync(Base.metadata.drop_all)
-            await connection.run_sync(Base.metadata.create_all)
+            # await connection.run_sync(Base.metadata.create_all)
 
     @staticmethod
     async def insert_names(model: Type[WomanName | ManName], names: list[str]) -> None:

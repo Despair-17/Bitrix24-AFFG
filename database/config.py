@@ -1,7 +1,7 @@
 from dataclasses import dataclass
+from os import getenv
 
 from dotenv import load_dotenv
-from os import getenv
 
 load_dotenv()
 
@@ -19,7 +19,7 @@ class Settings:
         return f'postgresql+asyncpg://{self.DB_USER}:{self.DB_PASS}@{self.DB_HOST}:{self.DB_PORT}/{self.DB_NAME}'
 
 
-setting = Settings(
+settings = Settings(
     getenv('DB_HOST'),
     getenv('DB_PORT'),
     getenv('DB_USER'),
