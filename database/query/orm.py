@@ -1,6 +1,6 @@
 from typing import Type
 
-from sqlalchemy import select
+from sqlalchemy import select, delete
 
 from ..database import Base, engine_async, session_async_factory
 from ..models import WomanName, ManName
@@ -28,3 +28,10 @@ class AsyncORM:
             query = select(model).filter(model.name == name)
             result = await session.execute(query)
             return result.scalars().all()
+
+    @staticmethod
+    async def delete_all_data(model: Type[WomanName | ManName]):
+        async with session_async_factory() as session:
+            stmt = delete(model)
+            await session.execute(stmt)
+            await session.commit()
