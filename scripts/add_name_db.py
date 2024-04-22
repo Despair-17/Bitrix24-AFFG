@@ -21,8 +21,7 @@ async def read_file_add_db(path: str, model: Type[WomanName | ManName]) -> None:
         print(err)
 
 
-async def main():
-    file_names = [('names_woman.txt', WomanName), ('names_men.txt', ManName)]
+async def main(file_names: list[tuple[str, Type[WomanName | ManName]]]):
     tasks = []
     currdir = os.path.dirname(__file__)
     testdatadir = os.path.join(currdir, '..', 'testdata')
@@ -35,4 +34,9 @@ async def main():
 
 
 if __name__ == '__main__':
-    asyncio.run(main())
+    """Скрипт добавляет в БД имена из файлов в папке testdata, функция main на вход принимает список с кортежами, где
+    первый элемент название файла, второй это обращение (гендер) представляющие из себя классы модели ORM: WomanName - 
+    женское имя, ManName - мужские имена. Благодаря асинхронности можно добавлять огромные объемы данных очень быстро"""
+
+    file_names_with_data = [('names_woman.txt', WomanName), ('names_men.txt', ManName)]
+    asyncio.run(main(file_names_with_data))
