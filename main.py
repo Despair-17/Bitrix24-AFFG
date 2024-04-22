@@ -22,12 +22,18 @@ async def main():
     # print(res)
     # await AsyncORM.delete_all_data(WomanName)
     # await AsyncORM.delete_all_data(ManName)
-    # async with BitrixAPI(api_key) as conn:
-    #     s1 = await conn.get_contact_data()
-    #     print(s1)
-    #
-    #     s2 = await conn.update_contact_gender('1', 'men')
-    #     print(s2)
+    async with BitrixAPI(api_key) as conn:
+        #     s1 = await conn.get_contact_data()
+        #     print(s1)
+        #
+        #     s2 = await conn.update_contact_gender('1', 'men')
+        #     print(s2)
+        # s3 = await conn.add_contact('Борис')
+        # print(s3)
+        s4 = await conn.get_all_contacts()
+        print(s4)
+        s4 = await conn.delete_contact('11')
+        print(s4)
     ...
 
 
