@@ -10,8 +10,9 @@ API_KEY = getenv('API_KEY')
 
 
 async def main():
-    async with BitrixAPI(API_KEY, 10) as conn:
-        contacts = await conn.get_all_contacts()
+    async with BitrixAPI(API_KEY, 500) as conn:
+        contacts = await conn.get_contact_data(without_gender=False)
+        print(len(contacts))
         tasks = []
         for contact in contacts:
             pk = contact['ID']
@@ -19,12 +20,11 @@ async def main():
             tasks.append(task)
 
         result = await asyncio.gather(*tasks)
-        print(result)
+        print(f'Всего удалено {sum(result)} из {len(contacts)} контактов.')
 
 
 if __name__ == '__main__':
     """Скрипт удаляет все контакты из системы Bitrix24. Благодаря асинхронности можно добавлять огромные объемы данных 
     очень быстро, класс BitrixAPI принимает на вход ограничение количества одновременных запросов на добавления 
-    контактов, можно увеличить или уменьшить в зависимости от ограничений API Bitrix24, по умолчанию 1000 (В случае с
-    удалением контактов лучше выставлять количество одновременных запросов менее 50)"""
+    контактов, можно увеличить или уменьшить в зависимости от ограничений API Bitrix24, по умолчанию 1000"""
     asyncio.run(main())

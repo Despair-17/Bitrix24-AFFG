@@ -22,19 +22,33 @@ class BitrixAPI:
     async def __aexit__(self, exc_type, exc_val, exc_tb):
         await self._session.close()
 
-    async def get_contact_data(self) -> list[dict[str, Any]] | tuple[None, int]:
+    async def get_contact_data(self, without_gender: bool = True) -> list[dict[str, Any]]:
         """Метод отправляет GET запрос к Bitrix24 получает JSON ответ, в котором содержатся все контакты без обращений
-        (гендера) и возвращает список из словарей, содержащие эти контакты, либо кортеж из None и кода ответа."""
+        (гендера) и возвращает список из словарей, содержащие эти контакты. Флаг without_gender - если True, то
+        возвращает все, иначе только без обращения"""
+        all_contacts = []
+        start = 0
+        limit = 50
+        total = float('inf')
+
         params = {
-            'filter[HONORIFIC]': '',
+            'start': start,
             'select[]': ['ID', 'NAME'],
         }
+        if without_gender:
+            params['filter[HONORIFIC]'] = ''
 
-        async with self._session.get(self._get_contacts_url, params=params) as response:
-            if response.status == 200:
-                json_response = await response.json()
-                return json_response.get('result')
-            return None, response.status
+        while len(all_contacts) < total:
+            async with self._session.get(self._get_contacts_url, params=params) as response:
+                if response.status == 200:
+                    json_response = await response.json()
+                    total = json_response.get('total')
+                    all_contacts.extend(json_response.get('result'))
+                    params['start'] += limit
+                else:
+                    raise aiohttp.ClientResponseError(response.request_info, history=tuple(), status=response.status)
+
+        return all_contacts
 
     async def update_contact_gender(self, pk: str, gender: str) -> bool | tuple[None, int]:
         """Метод отправляет POST запрос к Bitrix24 на изменение обращения (гендера) контакта. pk - это id контакта на
@@ -72,17 +86,6 @@ class BitrixAPI:
                     pk = json_response.get('result')
                     return pk
                 return None, response.status
-
-    async def get_all_contacts(self) -> bool | tuple[None, int]:
-        """Метод возвращает все контакты с Bitrix24 их id и name. (В тех. задании не требуется, но нужен для текстов)"""
-        params = {
-            'select[]': ['ID', "name"],
-        }
-        async with self._session.get(self._get_contacts_url, params=params) as response:
-            if response.status == 200:
-                json_response = await response.json()
-                return json_response.get('result')
-            return None, response.status
 
     async def delete_contact(self, pk: str) -> bool | tuple[None, int]:
         """Метод удаляет контакт с Bitrix24 по id. (В тех. задании не требуется, но нужен для текстов)"""
