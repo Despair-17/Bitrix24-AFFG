@@ -50,10 +50,10 @@ class BitrixAPI:
 
         return all_contacts
 
-    async def update_contact_gender(self, pk: str, gender: str) -> bool | tuple[None, int]:
+    async def update_contact_gender(self, pk: str, gender: str) -> bool:
         """Метод отправляет POST запрос к Bitrix24 на изменение обращения (гендера) контакта. pk - это id контакта на
         Bitrix24, gender - это обращение (women - г-жа), (men - г-н), возвращает при статусе ответа 200 True/False
-        при ином кортеж из None и кода ответа."""
+        """
         gender = 'HNR_RU_2' if gender == 'woman' else 'HNR_RU_1'
         data = {
             'ID': pk,
@@ -68,33 +68,35 @@ class BitrixAPI:
                 if response.status == 200:
                     json_response = await response.json()
                     return json_response.get('result')
-                return None, response.status
+                raise aiohttp.ClientResponseError(response.request_info, history=tuple(), status=response.status)
 
-    async def add_contact(self, name: str) -> int | tuple[None, int]:
-        """Метод отправляет POST запрос к Bitrix24 на добавление контакта, возвращает при статусе ответа 200 id -
-        контакта при ином кортеж из None и кода ответа. (В тех. задании не требуется, но нужен для текстов)."""
+    async def add_contact(self, name: str) -> int:
+        """Метод отправляет POST запрос к Bitrix24 на добавление контакта, возвращает при статусе ответа 200 id
+        контакта. (В тех. задании не требуется, но нужен для текстов)."""
         data = {
             "fields":
                 {
                     "NAME": name,
                 }
         }
+
         async with self._semaphore:
             async with self._session.post(self._add_contact_url, json=data) as response:
                 if response.status == 200:
                     json_response = await response.json()
                     pk = json_response.get('result')
                     return pk
-                return None, response.status
+                raise aiohttp.ClientResponseError(response.request_info, history=tuple(), status=response.status)
 
-    async def delete_contact(self, pk: str) -> bool | tuple[None, int]:
+    async def delete_contact(self, pk: str) -> bool:
         """Метод удаляет контакт с Bitrix24 по id. (В тех. задании не требуется, но нужен для текстов)"""
         data = {
             "ID": pk,
         }
+
         async with self._semaphore:
             async with self._session.post(self._delete_contact_url, json=data) as response:
                 if response.status == 200:
                     json_response = await response.json()
                     return json_response.get('result')
-                return None, response.status
+                raise aiohttp.ClientResponseError(response.request_info, history=tuple(), status=response.status)
