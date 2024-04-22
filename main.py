@@ -30,7 +30,7 @@ async def check_name_in_database(contact: dict[str, str]) -> dict[str, str]:
 
 async def main():
     print(f'Запуск приложения...')
-    async with BitrixAPI(API_KEY) as conn:
+    async with BitrixAPI(API_KEY, 100) as conn:
         contacts_without_gender = await conn.get_contact_data()
         print(f'Контакты получены с Bitrix24...')
         tasks = []
@@ -52,7 +52,7 @@ async def main():
 
         try:
             result = await asyncio.gather(*tasks)
-            print(f'Добавлено обращение {sum(result)} из {count_contacts_without_gender} контактов.')
+            print(f'Добавлено обращений {sum(result)} из {count_contacts_without_gender} контактам.')
         except aiohttp.ClientResponseError as err:
             print(err)
 

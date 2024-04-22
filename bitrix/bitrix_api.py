@@ -6,9 +6,8 @@ from typing import Any
 
 class BitrixAPI:
 
-    def __init__(self, api_key: str, max_connect: int = 1000):
-        """api_key - вебхук bitrix24, max_connect - ограничение на количество одновременных запросов к bitrix24 на
-        изменения обращения (гендера)"""
+    def __init__(self, api_key: str, max_connect: int = 100):
+        """api_key - вебхук bitrix24, max_connect - ограничение на количество одновременных запросов к Bitrix24"""
         self._semaphore = asyncio.Semaphore(max_connect)
         self._get_contacts_url = f'{api_key}crm.contact.list.json'
         self._update_contact_url = f'{api_key}crm.contact.update.json'
